@@ -1,0 +1,22 @@
+import requests
+import time
+
+# Define the target URL
+URL = "https://example.com"  # Replace with your actual URL
+
+# Set the number of requests per minute
+REQUESTS_PER_MINUTE = 100
+INTERVAL = 60 / REQUESTS_PER_MINUTE  # Interval between requests
+
+def send_requests():
+    for i in range(REQUESTS_PER_MINUTE):
+        try:
+            response = requests.get(URL, timeout=5)  # Set timeout to avoid hanging requests
+            print(f"Request {i+1}: {response.status_code}")
+        except requests.RequestException as e:
+            print(f"Request {i+1} failed: {e}")
+        
+        time.sleep(INTERVAL)  # Wait before the next request
+
+while True:
+    send_requests()  # Run continuously
