@@ -1,3 +1,15 @@
+# Register the browser manually if needed (Windows-specific paths)
+if platform.system() == "Windows":
+    chrome_path = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    edge_path = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+
+    if BROWSER == "chrome" and os.path.exists(chrome_path):
+        webbrowser.register("chrome", None, webbrowser.BackgroundBrowser(chrome_path))
+    elif BROWSER == "edge" and os.path.exists(edge_path):
+        webbrowser.register("msedge", None, webbrowser.BackgroundBrowser(edge_path))
+
+
+
 webbrowser.register('msedge', None, webbrowser.BackgroundBrowser("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"))
 
 import webbrowser
