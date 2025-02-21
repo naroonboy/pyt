@@ -1,0 +1,20 @@
+import webbrowser
+import time
+
+# URL to open
+URL = "http://example.com"  # Replace with your desired URL
+
+# Choose the browser: 'chrome' or 'edge'
+BROWSER = "chrome"  # Change to "edge" if needed
+
+# Open the URL every minute
+while True:
+    if BROWSER == "chrome":
+        webbrowser.get("chrome").open(URL)
+    elif BROWSER == "edge":
+        webbrowser.get("msedge").open(URL)
+    else:
+        print("Invalid browser choice. Use 'chrome' or 'edge'.")
+    
+    print(f"Opened {URL} in {BROWSER}. Waiting for 1 minute...")
+    time.sleep(60)  # Wait for 60 seconds
