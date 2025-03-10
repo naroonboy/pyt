@@ -1,0 +1,27 @@
+---
+- name: Copy and untar file on remote host
+  hosts: "{{ target_env }}"
+  become: yes
+  vars:
+    tarball_src: /path/to/your/file.tar.gz
+    tarball_dest: /tmp/file.tar.gz
+    extract_path: /opt/your_target_directory/
+
+  tasks:
+    - name: Copy tarball to remote host
+      ansible.builtin.copy:
+        src: "{{ tarball_src }}"
+        dest: "{{ tarball_dest }}"
+        mode: '0644'
+
+    - name: Ensure target directory exists
+      ansible.builtin.file:
+        path: "{{ extract_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Untar the file on remote host
+      ansible.builtin.unarchive:
+        src: "{{ tarball_dest }}"
+        dest: "{{ extract_path }}"
+        remote_src: yes
