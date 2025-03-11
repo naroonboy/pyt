@@ -1,27 +1,23 @@
----
-- name: Copy and untar file on remote host
-  hosts: "{{ target_env }}"
-  become: yes
-  vars:
-    tarball_src: /path/to/your/file.tar.gz
-    tarball_dest: /tmp/file.tar.gz
-    extract_path: /opt/your_target_directory/
+#!/bin/bash
 
-  tasks:
-    - name: Copy tarball to remote host
-      ansible.builtin.copy:
-        src: "{{ tarball_src }}"
-        dest: "{{ tarball_dest }}"
-        mode: '0644'
+LOGFILE="/apps/testing/test.log"
+ROTATE_DIR="/apps/testing"
+ARCHIVE_DIR="/apps/testing/archive"
+DATE=$(date +%F)
 
-    - name: Ensure target directory exists
-      ansible.builtin.file:
-        path: "{{ extract_path }}"
-        state: directory
-        mode: '0755'
+mkdir -p "$ARCHIVE_DIR"
 
-    - name: Untar the file on remote host
-      ansible.builtin.unarchive:
-        src: "{{ tarball_dest }}"
-        dest: "{{ extract_path }}"
-        remote_src: yes
+# Step 1: Rotate today's log into the same dir
+if [ -f "$LOGFILE" ]; then
+  mv "$LOGFILE" "$ROTATE_DIR/test.log.$DATE"
+  touch "$LOGFILE"
+  chmod 644 "$LOGFILE"
+fi
+
+# Step 2: Find logs older than 7 days and archive them
+OLD_LOGS=$(find "$ROTATE_DIR" -maxdepth 1 -name "test.log.*" -type f -mtime +6)
+
+if [ ! -z "$OLD_LOGS" ]; then
+  TARFILE="$ARCHIVE_DIR/test-logs-archive-$(date +%F).tar.gz"
+  tar -czf "$TARFILE" $OLD_LOGS && rm -f $OLD_LOGS
+fi
