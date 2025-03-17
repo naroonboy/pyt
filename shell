@@ -1,0 +1,21 @@
+#!/bin/bash
+
+OUTPUT_FILE="health_check_output.txt"
+URLS=("http://0.0.0.0:13133" "http://0.0.0.0:8888")
+
+while true; do
+    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+    for URL in "${URLS[@]}"; do
+        RESPONSE=$(curl -s "$URL")
+
+        if [ $? -eq 0 ]; then
+            echo "[$TIMESTAMP] URL: $URL | Health: $RESPONSE" >> "$OUTPUT_FILE"
+        else
+            echo "[$TIMESTAMP] URL: $URL | Health: ❌ Failed to reach endpoint" >> "$OUTPUT_FILE"
+        fi
+    done
+
+    echo "" >> "$OUTPUT_FILE"  # Add a blank line after each run
+    sleep 60
+done
