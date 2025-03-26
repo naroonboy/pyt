@@ -1,0 +1,66 @@
+{
+  "name": "Otel Collector - Full Telemetry Pipeline Monitoring",
+  "description": "Comprehensive dashboard to monitor OpenTelemetry Collector metrics, traces, and logs pipelines.",
+  "charts": [
+    {
+      "name": "Collector CPU Utilization",
+      "programText": "data('process_cpu_seconds_total', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .publish()",
+      "viz": "line"
+    },
+    {
+      "name": "Collector Memory Usage (MB)",
+      "programText": "data('process_resident_memory_bytes', filter=filter('service.name', 'otel-collector'))\n  .mean()\n  .publish()\n  .scale(1/1024/1024)",
+      "viz": "area"
+    },
+    {
+      "name": "Metric Points Sent by Exporter",
+      "programText": "data('otelcol_exporter_sent_metric_points', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .group_by(['exporter'], 'sum')\n  .publish()",
+      "viz": "column"
+    },
+    {
+      "name": "Spans Sent by Exporter",
+      "programText": "data('otelcol_exporter_sent_spans', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .group_by(['exporter'], 'sum')\n  .publish()",
+      "viz": "column"
+    },
+    {
+      "name": "Log Records Sent by Exporter",
+      "programText": "data('otelcol_exporter_sent_log_records', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .group_by(['exporter'], 'sum')\n  .publish()",
+      "viz": "column"
+    },
+    {
+      "name": "Dropped Spans by Exporter",
+      "programText": "data('otelcol_exporter_send_failed_spans', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .group_by(['exporter'], 'sum')\n  .publish()",
+      "viz": "column"
+    },
+    {
+      "name": "Dropped Log Records by Exporter",
+      "programText": "data('otelcol_exporter_send_failed_log_records', filter=filter('service.name', 'otel-collector'))\n  .rate('1m')\n  .group_by(['exporter'], 'sum')\n  .publish()",
+      "viz": "column"
+    },
+    {
+      "name": "Queue Size (Batch Processor)",
+      "programText": "data('otelcol_processor_batch_batch_send_size', filter=filter('service.name', 'otel-collector'))\n  .mean()\n  .publish()",
+      "viz": "line"
+    },
+    {
+      "name": "Scrape Targets Active",
+      "programText": "data('prometheus_target_scrape_pool_targets', filter=filter('service.name', 'otel-collector'))\n  .mean()\n  .publish()",
+      "viz": "line"
+    },
+    {
+      "name": "Scrape Duration (seconds)",
+      "programText": "data('prometheus_target_scrape_pool_scrape_duration_seconds', filter=filter('service.name', 'otel-collector'))\n  .mean()\n  .publish()",
+      "viz": "line"
+    }
+  ],
+  "layout": {
+    "columnWidth": 6,
+    "rows": [
+      { "charts": [0, 1] },
+      { "charts": [2, 3] },
+      { "charts": [4, 5] },
+      { "charts": [6, 7] },
+      { "charts": [8, 9] }
+    ]
+  }
+}
