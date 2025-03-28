@@ -1,0 +1,26 @@
+#!/bin/bash
+
+BASEDIR="/path/to/config"
+LOGFILE="/path/to/logfile.log"
+RUNUSER="oteluser"  # Update with the actual user running the script
+OTELCOLL="/path/to/otelcol"  # Update with the correct path
+
+# Ensure the script runs as the correct user
+if [ "$(id -un)" == "$RUNUSER" ]; then
+    # Start with predefined configs
+    CONFIG_FILES=()
+
+    # Automatically find and add all YAML config files
+    for config in "$BASEDIR"/config/*.yml; do
+        CONFIG_FILES+=("$config")
+    done
+
+    # Log the loaded config files
+    echo "Loaded Configurations: ${CONFIG_FILES[*]}"
+
+    # Run the OpenTelemetry Collector with all configs dynamically
+    nohup ${OTELCOLL} $(printf -- "--config %s " "${CONFIG_FILES[@]}") > "$LOGFILE" 2>&1 < /dev/null &
+
+    # Verify if the process is running
+    ps -ef | grep otelcol | grep -v grep
+fi
