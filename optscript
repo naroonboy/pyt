@@ -1,0 +1,55 @@
+Final Optimized Script: Auto-Export & Load New Configs
+sh
+Copy
+Edit
+#!/bin/bash
+
+BASEDIR="/path/to/config"
+
+# Start with predefined configs
+CONFIG_FILES=("${BASEDIR}/config/gateway_config.yml")
+
+# Automatically find and add all new YAML config files (excluding duplicates)
+for config in "$BASEDIR"/config/*.yml; do
+    if [[ ! " ${CONFIG_FILES[@]} " =~ " ${config} " ]]; then
+        CONFIG_FILES+=("$config")
+    fi
+done
+
+# Export all collected config files as a single environment variable
+export OTELCONF="${CONFIG_FILES[*]}"
+
+# Log the loaded configs (optional)
+echo "Loaded Configurations: $OTELCONF"
+
+# Start the OpenTelemetry Collector with all configs dynamically
+otelcol $(printf -- "--config %s " "${CONFIG_FILES[@]}")
+🔹 How This Works:
+✅ Automatically detects new config files and adds them dynamically.
+✅ Avoids manual exports by setting OTELCONF dynamically at runtime.
+✅ Prevents duplicates, so existing configs don't get re-added.
+✅ Starts OpenTelemetry Collector (otelcol) with all valid configs.
+
+🛠️ Steps to Use:
+Make the script executable:
+
+sh
+Copy
+Edit
+chmod +x start-otel.sh
+Run the script:
+
+sh
+Copy
+Edit
+./start-otel.sh
+Every time a new config is added, just restart the script—no manual exports needed. 🚀
+
+Let me know if you need further refinements! 🔥
+
+
+
+
+
+
+
