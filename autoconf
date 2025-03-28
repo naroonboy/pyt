@@ -1,0 +1,12 @@
+Auto-load Configs from a Central Location
+
+Store config files in Git, HashiCorp Vault, or a config management tool.
+
+Example: Use a script to auto-load new config files at runtime.
+
+sh
+Copy
+Edit
+for config in /config/*.yml; do
+    otelcol --config $config
+done
