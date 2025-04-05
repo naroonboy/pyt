@@ -1,0 +1,43 @@
+#!/bin/bash
+
+BASEDIR="/path/to/config"
+OTELCOL_BIN="/path/to/otelcol"
+LOGFILE="/var/log/otelcol-start.log"
+
+echo "🔄 Restarting Splunk Otel Collector..." | tee -a "$LOGFILE"
+
+# ✅ Step 1: Stop existing otelcol process gracefully
+echo "🛑 Stopping existing otelcol processes..." | tee -a "$LOGFILE"
+PIDS=$(pgrep -f "$OTELCOL_BIN")
+
+if [[ -n "$PIDS" ]]; then
+    echo "🔍 Found running otelcol PIDs: $PIDS" | tee -a "$LOGFILE"
+    kill -TERM $PIDS
+    sleep 3  # give it time to terminate
+    echo "✅ Collector stopped." | tee -a "$LOGFILE"
+else
+    echo "ℹ️ No running otelcol process found." | tee -a "$LOGFILE"
+fi
+
+# ✅ Step 2: Rebuild config list dynamically
+CONFIG_FILES=("${BASEDIR}/gateway_config.yml")
+
+for config in "$BASEDIR"/*.yml; do
+    if [[ ! " ${CONFIG_FILES[*]} " =~ " ${config} " ]]; then
+        CONFIG_FILES+=("$config")
+    fi
+done
+
+export OTELCONF="${CONFIG_FILES[*]}"
+
+echo "🔧 Loaded Config Files:" | tee -a "$LOGFILE"
+for cfg in "${CONFIG_FILES[@]}"; do
+    echo "  - $cfg" | tee -a "$LOGFILE"
+done
+
+# ✅ Step 3: Start the collector
+echo "🚀 Starting OpenTelemetry Collector..." | tee -a "$LOGFILE"
+nohup "$OTELCOL_BIN" $(printf -- "--config %s " "${CONFIG_FILES[@]}") >> "$LOGFILE" 2>&1 &
+
+sleep 2
+ps -ef | grep "[o]telcol" | tee -a "$LOGFILE"
